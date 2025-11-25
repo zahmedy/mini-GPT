@@ -19,7 +19,6 @@ class CausalSelfAttention(nn.Module):
     """
     A single multi-head causal self-attention layer.
     """
-
     def __init__(self, embed_dim: int, num_heads: int, dropout: float):
         super().__init__()
         self.embed_dim = embed_dim

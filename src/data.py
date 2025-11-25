@@ -23,7 +23,7 @@ class TextDataset(Dataset):
 
     def __len__(self):
         # Number of possible blocks we can extract
-        return len(self.data) - self.block_size
+        return max(0, len(self.data) - self.block_size)
 
     def __getitem__(self, idx):
         # x: characters from idx to idx+block_size
