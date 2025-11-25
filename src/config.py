@@ -12,7 +12,7 @@ VOCAB_SIZE = None   # we'll fill this dynamically once we build the tokenizer
 EMBED_DIM = 128
 NUM_HEADS = 4
 NUM_LAYERS = 2
-FNN_DIM = 4 * EMBED_DIM
+FFN_DIM = 4 * EMBED_DIM
 DROPOUT = 0.1
 
 # TRAINING

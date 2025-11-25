@@ -17,10 +17,10 @@ class CharTokenizer:
         self.stoi = {ch: i for i, ch in enumerate(chars)}
         self.itos = {i: ch for i, ch in enumerate(chars)}
 
-    def decode(self, s: str):
+    def encode(self, s: str):
         """Convert string to list of integers."""
         return [self.stoi[ch] for ch in s]
     
-    def encode(self, ids):
+    def decode(self, ids):
          """Convert list of integers back to string."""
-         return [self.itos[i] for i in ids]
+         return "".join(self.itos[i] for i in ids)
