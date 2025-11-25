@@ -1,0 +1,4 @@
+Once upon a time, there was a small language model.
+It liked to generate tiny bits of text.
+Sometimes the text made sense, sometimes it was silly.
+But it was always learning from the characters it saw.
