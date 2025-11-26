@@ -67,6 +67,16 @@ def generate(
         # 6. Convert to probabilities
         probs = F.softmax(logits_last, dim=-1)  # (1, vocab_size)
 
+        # ---- TOP-K SAMPLING ----
+        def top_k_filter(probs, k=20):
+            values, indices = torch.topk(probs, k)
+            mask = torch.zeros_like(probs)
+            mask.scatter_(1, indices, values)
+            filtered_probs = mask / torch.sum(mask, dim=-1, keepdim=True)
+            return filtered_probs
+
+        probs = top_k_filter(probs, k=30)   # you can tune k
+
         # 7. Sample next token id
         next_id = torch.multinomial(probs, num_samples=1)  # (1, 1)
 
@@ -84,6 +94,7 @@ def main():
     # Try a few different prompts
     while True:
         prompt = input("\nEnter a prompt (or empty to quit): ")
+        prompt = prompt.lower()
         if prompt.strip() == "":
             break
 
@@ -92,8 +103,8 @@ def main():
             model,
             tokenizer,
             start_text=prompt,
-            max_new_tokens=20,
-            temperature=0.7,  # try 0.7–1.2
+            max_new_tokens=100,
+            temperature=1.5,  # try 0.7–1.2
         )
         print(generated)
 
