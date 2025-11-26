@@ -19,11 +19,16 @@ class TextDataset(Dataset):
         self.block_size = block_size
 
         # Encode entire text into integers once
-        self.data = torch.tensor(tokenizer.encode(text), dtype=torch.long)
+        encoded = tokenizer.encode(text)
+        if len(encoded) <= block_size:
+            raise ValueError(
+                f"Text length ({len(encoded)}) must be greater than block_size ({block_size})."
+            )
+        self.data = torch.tensor(encoded, dtype=torch.long)
 
     def __len__(self):
         # Number of possible blocks we can extract
-        return max(0, len(self.data) - self.block_size)
+        return len(self.data) - self.block_size
 
     def __getitem__(self, idx):
         # x: characters from idx to idx+block_size
@@ -42,20 +47,29 @@ def get_dataloaders(val_ratio: float = 0.1):
     torch.manual_seed(RANDOM_SEED)
 
     text = load_text()
-    tokenizer =  CharTokenizer(text)
+    tokenizer = CharTokenizer(text)
 
-    # Split encoded data into train/val by character position
     n = len(text)
-    split_idx = int(n * (1 - val_ratio))
+    if n <= BLOCK_SIZE:
+        raise ValueError(
+            f"Corpus is too small (len={n}) for block_size={BLOCK_SIZE}. "
+            "Add more text or reduce block_size."
+        )
 
+    # Ensure validation split has at least one block, but leave enough for training
+    val_size = max(int(n * val_ratio), BLOCK_SIZE + 1)
+    if n - val_size < BLOCK_SIZE + 1:
+        val_size = BLOCK_SIZE + 1
+
+    split_idx = n - val_size
     train_text = text[:split_idx]
     val_text = text[split_idx:]
 
     train_ds = TextDataset(train_text, tokenizer, BLOCK_SIZE)
     val_ds = TextDataset(val_text, tokenizer, BLOCK_SIZE)
 
-    train_dataloader = DataLoader(train_ds, BATCH_SIZE, shuffle=True)
-    val_dataloader = DataLoader(val_ds, BATCH_SIZE, shuffle=False)
+    train_dataloader = DataLoader(train_ds, BATCH_SIZE, shuffle=True, drop_last=False)
+    val_dataloader = DataLoader(val_ds, BATCH_SIZE, shuffle=False, drop_last=False)
 
     return train_dataloader, val_dataloader, tokenizer
 

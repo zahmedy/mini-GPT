@@ -1,4 +1,5 @@
 # src/train.py
+import os
 
 import torch
 import torch.nn as nn
@@ -67,6 +68,8 @@ def evaluate(model, dataloader, criterion):
 
 
 def main():
+    os.makedirs("saved_models", exist_ok=True)
+
     # 1. Get data + tokenizer
     train_loader, val_loader, tokenizer = get_dataloaders()
 

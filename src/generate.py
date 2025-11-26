@@ -1,4 +1,5 @@
 # src/generate.py
+import os
 
 import torch
 import torch.nn.functional as F
@@ -13,6 +14,11 @@ def load_model_and_tokenizer(checkpoint_path: str = "saved_models/mini_gpt.pth")
     """
     Load trained MiniGPT model + tokenizer built from the same corpus.
     """
+    if not os.path.exists(checkpoint_path):
+        raise FileNotFoundError(
+            f"Checkpoint not found at {checkpoint_path}. "
+            "Train first with `python3 -m src.train`."
+        )
     # 1. Rebuild tokenizer from full corpus text
     text = load_text()
     tokenizer = CharTokenizer(text)
@@ -69,10 +75,11 @@ def generate(
 
         # ---- TOP-K SAMPLING ----
         def top_k_filter(probs, k=20):
+            k = min(k, probs.size(-1))
             values, indices = torch.topk(probs, k)
             mask = torch.zeros_like(probs)
             mask.scatter_(1, indices, values)
-            filtered_probs = mask / torch.sum(mask, dim=-1, keepdim=True)
+            filtered_probs = mask / (mask.sum(dim=-1, keepdim=True) + 1e-8)
             return filtered_probs
 
         probs = top_k_filter(probs, k=30)   # you can tune k
