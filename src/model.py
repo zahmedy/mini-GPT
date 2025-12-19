@@ -97,8 +97,8 @@ class CausalSelfAttention(nn.Module):
 
         # Apply causal mask: prevent attending to future positions
         # causal_mask: (T, T) with 1s in lower triangle
-        mask = self.causal_mask[:T, :T]
-        scores = scores.masked_fill(mask == 0, float("-inf"))
+        mask = self.causal_mask[:T, :T].to(dtype=torch.bool)
+        scores = scores.masked_fill(~mask, float("-inf"))
 
         if verbose:
             print(f"\n  4️⃣  CAUSAL MASKING")
