@@ -24,6 +24,7 @@ def train_one_epoch(
     print(f"\n{'='*80}")
     print(f"🏋️  TRAINING EPOCH")
     print(f"{'='*80}")
+    input("\n⏸️  Press Enter to continue...")
 
     for batch_idx, (x, y) in enumerate(dataloader):
         # x, y: (B, T)
@@ -38,6 +39,7 @@ def train_one_epoch(
             print(f"   Target (y) shape: {y.shape}")
             print(f"   Sample input tokens:  {x[0, :10].tolist()}")
             print(f"   Sample target tokens: {y[0, :10].tolist()}")
+            input("\n⏸️  Press Enter to continue...")
 
         # 1. Forward pass: logits over vocab for each position
         logits = model(x)  # (B, T, vocab_size)
@@ -52,6 +54,7 @@ def train_one_epoch(
             print(f"   Reshaping for CrossEntropyLoss:")
             print(f"     Logits: ({B}, {T}, {V}) → ({B * T}, {V})")
             print(f"     Targets: ({B}, {T}) → ({B * T},)")
+            input("\n⏸️  Press Enter to continue...")
 
         logits = logits.view(B * T, V)
         y = y.view(B * T)
@@ -61,6 +64,7 @@ def train_one_epoch(
         if verbose:
             print(f"\n   Cross Entropy Loss: {loss.item():.4f}")
             print(f"   (Lower is better - measures how well model predicts next token)")
+            input("\n⏸️  Press Enter to continue...")
 
         # 3. Backprop
         if verbose:
@@ -84,11 +88,13 @@ def train_one_epoch(
                           f"grad norm={p.grad.norm().item():.6f}")
 
             print(f"   4. Update weights (optimizer.step)")
+            input("\n⏸️  Press Enter to continue...")
 
         optimizer.step()
 
         if verbose:
             print(f"   ✅ Weights updated!")
+            input("\n⏸️  Press Enter to continue...")
 
         running_loss += loss.item() * B * T
         total_tokens += B * T
@@ -100,6 +106,7 @@ def train_one_epoch(
 
     avg_loss = running_loss / total_tokens
     print(f"\n✅ Epoch complete. Average loss: {avg_loss:.4f}")
+    input("\n⏸️  Press Enter to continue...")
     return avg_loss
 
 
@@ -115,6 +122,7 @@ def evaluate(
     print(f"\n{'='*80}")
     print(f"📊 VALIDATION")
     print(f"{'='*80}")
+    input("\n⏸️  Press Enter to continue...")
 
     with torch.no_grad():
         for batch_idx, (x, y) in enumerate(dataloader):
@@ -133,6 +141,7 @@ def evaluate(
 
     avg_loss = running_loss / total_tokens
     print(f"Validation complete. Average loss: {avg_loss:.4f}")
+    input("\n⏸️  Press Enter to continue...")
     return avg_loss
 
 
@@ -142,6 +151,7 @@ def main() -> None:
     print("#" + " "*25 + "MINI-GPT TRAINING" + " "*36 + "#")
     print("#" + " "*78 + "#")
     print("#"*80)
+    input("\n⏸️  Press Enter to start...")
 
     os.makedirs("saved_models", exist_ok=True)
 
@@ -166,6 +176,7 @@ def main() -> None:
     print(f"Optimizer: Adam")
     print(f"Loss function: CrossEntropyLoss")
     print(f"{'='*80}")
+    input("\n⏸️  Press Enter to continue...")
 
     best_val_loss = float("inf")
 
@@ -199,6 +210,8 @@ def main() -> None:
                   f"improved by {improvement:.4f})")
         else:
             print(f"   Best val loss so far: {best_val_loss:.4f}")
+
+        input("\n⏸️  Press Enter to continue to next epoch...")
 
     print(f"\n\n{'#'*80}")
     print(f"# 🎉 TRAINING COMPLETE!")
